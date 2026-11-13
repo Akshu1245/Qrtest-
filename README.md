@@ -71,3 +71,12 @@ This is an educational prototype, **not a commercial threat detection product**.
 - [Vite](https://github.com/vitejs/vite) — MIT — build tooling
 
 These are separately licensed open-source dependencies, not original work of this project. Everything else in this repository is original project code; see CONTRIBUTIONS.md.
+
+### UI design credits
+
+The v3/v4 interface is original code (vanilla CSS/JS, no copied components), with its visual language and interaction ideas informed by:
+
+- **Google Stitch** (stitch.google.com) — initial "Cyber Sentinel" layout concept (sidebar console, telemetry bar, palette). Layout re-implemented by hand; no generated code shipped. Stitch's placeholder statistics were not carried over.
+- **microkit** ([github.com/henriquegpb/microkit](https://github.com/henriquegpb/microkit), MIT) — microinteraction ideas: press states, staggered row entrances.
+- **Magic UI** ([github.com/magicuidesign/magicui](https://github.com/magicuidesign/magicui), MIT) — shimmer/sheen button idea.
+- **React Bits** ([github.com/DavidHDev/react-bits](https://github.com/DavidHDev/react-bits), MIT + Commons Clause) — decrypted-text and spotlight-card ideas. Note: the Commons Clause forbids selling substantially derived software; this project is a non-commercial educational prototype. Re-implemented in vanilla JS from the published concept; no React code copied.

@@ -236,3 +236,44 @@ main{padding:0 34px 10px;max-width:1180px;width:100%;margin:0 auto}
   .grid{grid-template-columns:1fr}
   .foot{padding:14px 18px}
 }
+
+/* ---- v4 crafted interactions (see README "UI design credits") ---- */
+/* pointer spotlight on panels - idea: React Bits "Spotlight Card" (MIT + Commons Clause), hand-written */
+.panel{position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:radial-gradient(340px circle at var(--mx,50%) var(--my,-30%),rgba(0,240,255,.09),transparent 65%)}
+.panel:hover::before{opacity:1}
+.panel>*{position:relative;z-index:1}
+
+/* sheen sweep on primary buttons - idea: Magic UI "Shimmer Button" (MIT), hand-written */
+.primary{position:relative;overflow:hidden}
+.primary::after{content:"";position:absolute;top:-20%;left:-70%;width:45%;height:140%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);
+  animation:sheen 3.6s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes sheen{0%,55%{left:-70%}100%{left:140%}}
+
+/* staggered finding rows + verdict entrance - idea: microkit microinteractions (MIT), hand-written */
+.finding{animation:rise .38s cubic-bezier(.2,.7,.3,1) both;animation-delay:calc(var(--i,0)*65ms)}
+@keyframes rise{from{opacity:0;transform:translateY(7px)}}
+.verdict{animation:rise .4s cubic-bezier(.2,.7,.3,1) both}
+.gauge .fill{transition:stroke-dashoffset .9s cubic-bezier(.2,.7,.3,1)}
+
+/* press states */
+.primary:active:not(:disabled){transform:translateY(1px) scale(.985)}
+.secondary:active:not(:disabled){transform:scale(.97)}
+.filebtn:active{transform:scale(.96)}
+.histitem:active{background:rgba(0,240,255,.12)}
+.primary,.secondary,.filebtn{transition:transform .12s ease,box-shadow .15s,border-color .15s,background .15s}
+
+/* toggle microinteraction */
+.toggle input{transition:accent-color .2s}
+
+/* drop zone breathing while idle */
+.drop{animation:dropbreathe 4.5s ease-in-out infinite}
+@keyframes dropbreathe{0%,100%{border-color:rgba(0,240,255,.35)}50%{border-color:rgba(0,240,255,.6)}}
+.drop.drag{animation:none}
+
+/* reduced motion: everything settles instantly */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}

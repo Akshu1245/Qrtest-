@@ -84,6 +84,30 @@ app.innerHTML=`<div class="app">
 
 const $=s=>document.querySelector(s);
 let last=null,stream=null,frame=null,liveSeq=0;
+
+/* v4 crafted interactions (hand-written, inspired by credited open-source UI work - see README "UI design credits"):
+   - decrypt/scramble reveal on the verdict and hero word  (idea: React Bits "Decrypted Text")
+   - pointer spotlight on panels                            (idea: React Bits "Spotlight Card")
+   - staggered finding rows + press states                  (idea: microkit microinteractions) */
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const GLYPHS='ABCDEF0123456789#$%&*+';
+function scramble(el,final){
+  if(REDUCED||!el){if(el)el.textContent=final;return}
+  let step=0;const total=Math.max(10,final.length*2);
+  const id=setInterval(()=>{
+    step++;
+    el.textContent=final.split('').map((ch,i)=>ch===' '?' ':(i<(step/total)*final.length?ch:GLYPHS[Math.random()*GLYPHS.length|0])).join('');
+    if(step>=total){el.textContent=final;clearInterval(id)}
+  },28);
+}
+document.querySelectorAll('.panel').forEach(p=>{
+  p.addEventListener('pointermove',e=>{
+    const r=p.getBoundingClientRect();
+    p.style.setProperty('--mx',(e.clientX-r.left)+'px');
+    p.style.setProperty('--my',(e.clientY-r.top)+'px');
+  });
+});
+scramble(document.querySelector('.hero h1 em'),'interact');
 function showMessage(msg){$('#message').textContent=msg}
 function safe(t){return String(t).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
 const TAG={high:'HIGH',caution:'WARN',info:'INFO',unknown:'NOTE'};
@@ -115,7 +139,10 @@ function renderAssessment(liveState,live){
   $('#chip').className='chip '+(live&&live.status==='flagged'?'high':r.level);
   $('#chip').textContent=chipText;
   $('#assessment').className='details';
-  $('#assessment').innerHTML=`<div class="verdict ${r.level}"><div class="verdict-main"><span class="verdict-kicker">VERDICT</span><span class="verdict-word">${chipText}</span><span class="verdict-sub">${safe(r.headline)}</span></div>${gaugeSvg(r.score,r.level)}</div><p class="details-text">${safe(r.details)}</p>${isUrl?liveBadgeHtml(live,liveState):''}<div class="findings">${r.findings.map(x=>`<div class="finding"><span class="tag ${safe(x.level)}">${TAG[x.level]||'NOTE'}</span><span class="finding-text">${safe(x.label)}</span></div>`).join('')}</div><div class="caveat">Educational assessment only. Absence of warnings does not prove safety.</div>`;
+  $('#assessment').innerHTML=`<div class="verdict ${r.level}"><div class="verdict-main"><span class="verdict-kicker">VERDICT</span><span class="verdict-word"></span><span class="verdict-sub">${safe(r.headline)}</span></div>${gaugeSvg(r.score,r.level)}</div><p class="details-text">${safe(r.details)}</p>${isUrl?liveBadgeHtml(live,liveState):''}<div class="findings">${r.findings.map((x,i)=>`<div class="finding" style="--i:${i}"><span class="tag ${safe(x.level)}">${TAG[x.level]||'NOTE'}</span><span class="finding-text">${safe(x.label)}</span></div>`).join('')}</div><div class="caveat">Educational assessment only. Absence of warnings does not prove safety.</div>`;
+  scramble($('#assessment .verdict-word'),chipText);
+  const g=$('#assessment .gauge .fill');
+  if(g&&!REDUCED){const target=g.getAttribute('stroke-dashoffset');g.style.strokeDashoffset=g.getAttribute('stroke-dasharray');requestAnimationFrame(()=>requestAnimationFrame(()=>{g.style.strokeDashoffset=target}))}
 }
 
 function run(text){
