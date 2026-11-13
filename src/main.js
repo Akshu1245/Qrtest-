@@ -4,6 +4,7 @@ import { checkUrlLive } from './threatintel.mjs';
 import { buildReportModel, toText, toPdf } from './report.mjs';
 import * as history from './history.mjs';
 import './style.css';
+import './depth.css';
 
 const ICONS={
  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.4 7.5 10 4.3-1.6 7.5-5.4 7.5-10v-6L12 2.5Z"/><path d="M8.5 12l2.4 2.4L15.7 9.5" stroke-linecap="round"/></svg>',
