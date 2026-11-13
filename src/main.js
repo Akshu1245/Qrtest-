@@ -94,31 +94,35 @@ function gaugeSvg(score,level){
 }
 
 function renderAssessment(liveState,live){
-  const r=last.analysis;const isUrl=r.type==='url';
+  const r=last.analysis;last.liveState=liveState;const isUrl=r.type==='url';
   const chipText=(live&&live.status==='flagged')?'LISTED DANGEROUS':r.level==='high'?'HIGH RISK':r.level==='caution'?'CAUTION':'NOT VERIFIED';
   $('#chip').className='chip '+(live&&live.status==='flagged'?'high':r.level);
   $('#chip').textContent=chipText;
   $('#assessment').className='details';
-  $('#assessment').innerHTML=`<div class="verdict ${r.level}"><div class="verdict-main"><span class="verdict-kicker">Verdict</span><span class="verdict-word">${chipText}</span><span class="verdict-sub">${safe(r.headline)}</span></div>${gaugeSvg(r.score,r.level)}</div><p class="details-text">${safe(r.details)}</p>${isUrl?liveBadgeHtml(live,liveState):''}<div class="findings">${r.findings.map(x=>`<div class="finding"><span class="tag ${safe(x.level)}">${TAG[x.level]||'NOTE'}</span><span class="finding-text">${safe(x.label)}</span></div>`).join('')}</div><div id="explain"></div><div class="caveat">Educational assessment only. Absence of warnings does not prove safety.</div>`;
+  $('#assessment').innerHTML=`<div class="verdict ${r.level}"><div class="verdict-main"><span class="verdict-kicker">Verdict</span><span class="verdict-word">${chipText}</span><span class="verdict-sub">${safe(r.headline)}</span></div>${gaugeSvg(r.score,r.level)}</div><p class="details-text">${safe(r.details)}</p>${isUrl?liveBadgeHtml(live,liveState):''}<div class="findings">${r.findings.map(x=>`<div class="finding"><span class="tag ${safe(x.level)}">${TAG[x.level]||'NOTE'}</span><span class="finding-text">${safe(x.label)}</span></div>`).join('')}</div><div id="explain">${last.explanation?explainHtml(last.explanation):''}</div><div class="caveat">Educational assessment only. Absence of warnings does not prove safety.</div>`;
 }
 
 // Rephrases the deterministic findings in simple words via /api/explain.
 // The LLM only rewords; the rule engine above is the only assessment.
 // Any failure leaves the block hidden - no fake or stale wording.
+function explainHtml(text){
+  return `<div class="explain-block"><div class="explain-h">In simple words</div><p>${safe(text)}</p><div class="explain-fine">AI rewording of the findings above. It may be imperfect - the verdict, score and findings from QRShield's rules are the assessment.</div></div>`;
+}
+
 async function explainLive(r){
-  const seq=++explainSeq;
+  const seq=++explainSeq,cur=last;
   if(!r.findings.length)return;
   try{
     const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),45000);
     const res=await fetch('/api/explain',{method:'POST',signal:ctrl.signal,headers:{'content-type':'application/json'},
       body:JSON.stringify({type:r.type,level:r.level,score:r.score,headline:r.headline,findings:r.findings.map(f=>({label:f.label,level:f.level}))})});
     clearTimeout(timer);
-    if(seq!==explainSeq)return; // a newer scan replaced this one
+    if(seq!==explainSeq||last!==cur)return; // a newer scan replaced this one
     if(!res.ok)return;
     const data=await res.json();
     if(data&&data.status==='ok'&&typeof data.explanation==='string'){
-      const box=$('#explain');if(!box)return;
-      box.innerHTML=`<div class="explain-block"><div class="explain-h">In simple words</div><p>${safe(data.explanation)}</p><div class="explain-fine">AI rewording of the findings above. It may be imperfect - the verdict, score and findings from QRShield's rules are the assessment.</div></div>`;
+      cur.explanation=data.explanation;
+      renderAssessment(cur.liveState||'idle',cur.live); // survive live-check re-renders
     }
   }catch{/* offline or unavailable: leave the block hidden */}
 }
@@ -129,7 +133,7 @@ function run(text){
   $('#text').value=text;
   const btn=$('#analyze');btn.disabled=true;btn.classList.add('busy');
   try{
-    last={input:text,analysis:analyze(text),live:null};
+    last={input:text,analysis:analyze(text),live:null,explanation:null,liveState:'idle',sourceImage:lastSourceImage};
     renderAssessment('idle',null);
     $('#export-txt').disabled=false;$('#export-pdf').disabled=false;
     $('#export-txt').title='Download the report as text';$('#export-pdf').title='Download the report as PDF';
