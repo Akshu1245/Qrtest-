@@ -1,8 +1,10 @@
 # QRShield — Internship Project Report
 
-**Internship:** Cybersecurity Internship, Zephyr Technologies & Solutions Pvt. Ltd. — 2 months (40 working days: Month 1 networking foundations, Month 2 core cybersecurity), assessed by daily lab work, weekly reviews, and a final practical demonstration with a short security assessment report. QRShield is that final project.
+**Intern:** K S Akshay (USN U19KU24S0062), New Horizon College, Marathahalli
 
-> Still to fill in before submission: intern name, college, mentor, and exact calendar dates (the training notes state the structure, not the dates). This report describes only what the code in this repository actually does.
+**Internship:** Cyber Security Internship, Zephyr Technologies and Solutions Pvt. Ltd., Bengaluru — 27 July 2026 to 27 September 2026, conducted offline (per the company's acceptance letter dated 25-07-2026). Structure per the company's training notes: 40 working days — Month 1 networking foundations, Month 2 core cybersecurity — assessed by daily lab work, weekly reviews, and a final practical demonstration with a short security assessment report. QRShield is that final project.
+
+> Still to fill in before submission: mentor/guide name and any college-required template. This report describes only what the code in this repository actually does.
 
 ## 1. Problem statement
 
