@@ -1,0 +1,14 @@
+/* v9-final blend: v7 field-dossier depth + v6 hand-drawn frames on the boxed
+   controls. Rough.js (MIT) draws the frames; Caveat (OFL) for three
+   hand-written labels. Pin-board takeaways applied: strict grid discipline,
+   one accent color, generous whitespace, no decorative noise. */
+.tool,.btn-ink,.btn-ghost,.drop{border-color:transparent!important;position:relative}
+.sketch-frame{position:absolute;pointer-events:none;overflow:visible;z-index:0}
+.tool{--sketch-color:var(--ink)}
+.drop{--sketch-color:var(--ink2)}
+
+/* three hand-written labels only; dossier type system stays */
+.t-head span:first-child{font-family:"Caveat",cursive;font-size:21px;font-weight:600;
+  text-transform:none;letter-spacing:.01em;color:var(--ink)}
+.empty-main{font-family:"Caveat",cursive;font-style:normal;font-size:46px}
+.drop span{font-family:"Caveat",cursive;font-size:18px}
