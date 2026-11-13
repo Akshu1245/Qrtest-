@@ -7,110 +7,67 @@ import './style.css';
 
 const ICONS={
  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.4 7.5 10 4.3-1.6 7.5-5.4 7.5-10v-6L12 2.5Z"/><path d="M8.5 12l2.4 2.4L15.7 9.5" stroke-linecap="round"/></svg>',
- camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 8h3l2-2.5h8L18 8h3v11H3V8Z"/><circle cx="12" cy="13" r="3.5"/></svg>',
- upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0 4 4m-4-4L8 8"/><path d="M4 16v3.5h16V16"/></svg>',
- link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 6 .4l3-3a4 4 0 0 0-5.6-5.6l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-6-.4l-3 3a4 4 0 0 0 5.6 5.6l1.5-1.5"/></svg>',
- history:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 1 2.5 6"/><path d="M3.5 12H1.8m1.7 0 2-2m-2 2 2 2"/><path d="M12 7.5V12l3 2"/></svg>',
- info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".4" fill="currentColor"/></svg>',
- download:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v2.5h16V17"/></svg>'
+ download:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0 4-4m-4-4-4-4"/><path d="M4 17v2.5h16V17"/></svg>'
 };
 
 const app=document.querySelector('#app');
-app.innerHTML=`<div class="app">
-<aside class="side">
-  <a class="brandrow" href="#top"><span class="mark">${ICONS.shield}</span><span class="wordmark">QRShield<small>THREAT ANALYZER</small></span></a>
-  <nav class="topnav"><a href="#scanner"><b>01</b>Scanner</a><a href="#analyzer"><b>02</b>Analyzer</a><a href="#result"><b>03</b>Results</a><a href="#history"><b>04</b>History</a><a href="#about"><b>05</b>About</a></nav>
-  <div class="side-foot"><div class="status"><i></i>LOCAL ENGINE READY</div><small>v2.0 &middot; on-device only</small></div>
-</aside>
-<div class="main">
-<div class="tele" id="top"><span><b>ENGINE</b>LOCAL-ONLY</span><span><b>PAYLOADS</b>NEVER UPLOADED</span><span><b>HISTORY</b>STAYS ON THIS DEVICE</span><span><b>LIVE CHECK</b>OPTIONAL &middot; GOOGLE WEB RISK</span></div>
-<main>
+app.innerHTML=`<div class="page">
+<header class="bar">
+  <a class="logo" href="#top">${ICONS.shield}<span>QRShield<sup>&reg;</sup></span></a>
+  <nav class="nav"><a href="#check">Scanner</a><a href="#result">Results</a><a href="#history">History</a><a href="#about">About</a></nav>
+</header>
+<main id="top" class="wrap">
   <section class="hero">
     <div class="hero-copy">
-      <div class="kicker">LOCAL-FIRST &middot; NO ACCOUNT &middot; NO TRACKING</div>
-      <h1>Inspect before<br>you <em>interact</em>.</h1>
-      <p>QR codes hide their destination. QRShield decodes them on this device and explains the warning signs &mdash; links, UPI payments, Wi-Fi configs &mdash; before you act.</p>
+      <p class="kicker">A QR &amp; link risk checker that runs on your device</p>
+      <h1>Inspect before<br>you <em>interact.</em></h1>
+      <p class="sub">QR codes hide where they lead. QRShield decodes them in your browser and explains the warning signs &mdash; links, UPI payments, Wi-Fi configs &mdash; before you pay, log in, or connect.</p>
     </div>
-    <div class="hero-art" aria-hidden="true">
-      <svg viewBox="0 0 200 200" class="qrart"><g fill="currentColor"><rect x="10" y="10" width="50" height="50" rx="4"/><rect x="22" y="22" width="26" height="26" fill="#0a0e17"/><rect x="140" y="10" width="50" height="50" rx="4"/><rect x="152" y="22" width="26" height="26" fill="#0a0e17"/><rect x="10" y="140" width="50" height="50" rx="4"/><rect x="22" y="152" width="26" height="26" fill="#0a0e17"/><rect x="80" y="15" width="12" height="12"/><rect x="100" y="15" width="12" height="12"/><rect x="80" y="35" width="12" height="12"/><rect x="110" y="45" width="12" height="12"/><rect x="15" y="80" width="12" height="12"/><rect x="40" y="95" width="12" height="12"/><rect x="15" y="110" width="12" height="12"/><rect x="70" y="80" width="12" height="12"/><rect x="95" y="80" width="12" height="12"/><rect x="120" y="80" width="12" height="12"/><rect x="145" y="85" width="12" height="12"/><rect x="170" y="80" width="12" height="12"/><rect x="80" y="105" width="12" height="12"/><rect x="105" y="110" width="12" height="12"/><rect x="160" y="110" width="12" height="12"/><rect x="85" y="135" width="12" height="12"/><rect x="140" y="140" width="50" height="12" rx="2"/><rect x="140" y="160" width="12" height="12"/><rect x="165" y="165" width="12" height="12"/><rect x="85" y="165" width="12" height="12"/><rect x="110" y="150" width="12" height="12"/></g><line x1="0" y1="100" x2="200" y2="100" class="scanline"/></svg>
-      <div class="hero-note">PAYLOADS NEVER LEAVE THIS DEVICE<span>except URLs you choose to check live</span></div>
-    </div>
+    <section class="tool" id="check" aria-label="Check a link or QR payload">
+      <div class="t-head"><span>Check a link or QR payload</span><span id="chip" class="chip idle">Not scanned</span></div>
+      <textarea id="text" rows="2" maxlength="12000" aria-label="URL, UPI payment QR or raw QR content" placeholder="https://example.com  or  upi://pay?pa=..." spellcheck="false"></textarea>
+      <div class="t-actions">
+        <button id="analyze" class="btn-ink"><span>Analyze</span><span class="arrow">&rarr;</span></button>
+        <label class="btn-ghost" for="file">Scan image</label>
+        <button id="camera" class="btn-ghost">Camera</button>
+      </div>
+      <input id="file" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+      <button id="stop" class="btn-ghost" hidden>Stop camera</button>
+      <video id="video" playsinline muted hidden></video>
+      <div class="drop" id="drop"><span>Drop a QR image here &middot; PNG, JPG, WebP &middot; max 8 MB</span></div>
+      <div id="message" role="status" aria-live="polite"></div>
+      <div class="t-meta"><span>Nothing is uploaded</span><span>Decoding happens on this device with jsQR</span></div>
+    </section>
   </section>
-  <div class="grid">
-    <div class="col">
-      <section id="scanner" class="panel">
-        <div class="panel-head"><span class="sec-label">01 / QR SCANNER</span><span class="sec-icon">${ICONS.camera}</span></div>
-        <p class="sec-desc">Drop an image or use the camera. Decoding happens locally with jsQR.</p>
-        <div class="drop" id="drop"><span class="drop-icon">${ICONS.upload}</span><strong>Drop a QR image here</strong><small>PNG, JPG, WebP &middot; max 8 MB</small><label class="filebtn" for="file">Choose image</label><input id="file" type="file" accept="image/png,image/jpeg,image/webp" hidden></div>
-        <div class="actions"><button id="camera" class="primary">${ICONS.camera}<span>Use camera</span></button><button id="stop" class="secondary" hidden>Stop camera</button></div>
-        <video id="video" playsinline muted hidden></video>
-      </section>
-      <section id="analyzer" class="panel">
-        <div class="panel-head"><span class="sec-label">02 / URL ANALYZER</span><span class="sec-icon">${ICONS.link}</span></div>
-        <p class="sec-desc">Paste a link, UPI payment QR or raw QR content.</p>
-        <label class="field-label" for="text">URL / UPI PAYMENT QR / RAW TEXT</label>
-        <textarea id="text" rows="3" maxlength="12000" placeholder="https://example.com  or  upi://pay?pa=..." spellcheck="false"></textarea>
-        <div class="actions"><button id="analyze" class="primary"><span>Analyze content</span><span class="arrow">&rarr;</span></button></div>
-        <div id="message" role="status" aria-live="polite"></div>
-      </section>
-      <section id="history" class="panel">
-        <div class="panel-head"><span class="sec-label">04 / SCAN HISTORY</span><span class="sec-icon">${ICONS.history}</span></div>
-        <p class="sec-desc">Private to this browser, stored on this device only, never uploaded.</p>
-        <div class="hist-controls"><label class="toggle"><input id="histtoggle" type="checkbox" checked> Save scans on this device</label><button id="histclear" class="secondary small">Clear</button></div>
-        <div id="histlist" class="histlist"></div>
-      </section>
-    </div>
-    <div class="col">
-      <section id="result" class="panel result">
-        <div class="panel-head"><span class="sec-label">03 / SECURITY RESULTS</span><span id="chip" class="chip idle">NOT SCANNED</span></div>
-        <div id="assessment" class="empty"><div class="empty-mark">${ICONS.shield}</div><strong>No scan yet</strong><p>Your findings, risk indicators and recommendations will appear here.</p></div>
-        <div class="actions exportrow"><button id="export-txt" class="secondary export" disabled>${ICONS.download}<span>Text report</span></button><button id="export-pdf" class="secondary export" disabled>${ICONS.download}<span>PDF report</span></button></div>
-      </section>
-      <section id="about" class="panel">
-        <div class="panel-head"><span class="sec-label">05 / ABOUT PROJECT</span><span class="sec-icon">${ICONS.info}</span></div>
-        <ol class="steps">
-          <li><b>DECODE</b><p>QR pixels become text on your device with jsQR. Images and camera frames are never uploaded.</p></li>
-          <li><b>INSPECT</b><p>Transparent rules score URLs and UPI payment details. If configured, a server-side endpoint also checks the link against Google Web Risk.</p></li>
-          <li><b>EXPLAIN</b><p>Every point in the score is listed. When a check cannot run, the verdict is "not checked" &mdash; never "safe".</p></li>
-        </ol>
-        <div class="foot-note">QRShield &middot; educational cybersecurity prototype &middot; no link or payee is guaranteed safe</div>
-      </section>
-    </div>
+  <section id="result" class="result">
+    <div id="assessment" class="empty"><span class="empty-label">Verdict</span><p class="empty-main">No scan yet.</p><p class="empty-sub">Your findings, risk indicators and recommendations will appear here.</p></div>
+    <div class="actions exportrow"><button id="export-txt" class="btn-ghost export" disabled>${ICONS.download}<span>Text report</span></button><button id="export-pdf" class="btn-ghost export" disabled>${ICONS.download}<span>PDF report</span></button></div>
+  </section>
+  <div class="row2">
+    <section id="history" class="hist">
+      <h2 class="sec-h">Scan history</h2>
+      <div class="hist-controls"><label class="toggle"><input id="histtoggle" type="checkbox" checked> Save scans on this device</label><button id="histclear" class="btn-ghost small">Clear</button></div>
+      <div id="histlist" class="histlist"></div>
+      <p class="fine">Private to this browser, stored on this device only, never uploaded.</p>
+    </section>
+    <section id="about" class="about">
+      <h2 class="sec-h">How it works</h2>
+      <ol class="steps">
+        <li><b>Decode</b><p>QR pixels become text on your device with jsQR. Images and camera frames are never uploaded.</p></li>
+        <li><b>Inspect</b><p>Transparent rules score URLs and UPI payment details. If configured, a server-side endpoint also checks the link against Google Web Risk.</p></li>
+        <li><b>Explain</b><p>Every point in the score is listed. When a check cannot run, the verdict is &ldquo;not checked&rdquo; &mdash; never &ldquo;safe&rdquo;.</p></li>
+      </ol>
+    </section>
   </div>
 </main>
-<footer class="foot"><span>QRShield &middot; educational cybersecurity prototype</span><span>Open source credits: jsQR &middot; jsPDF &middot; Vite</span><span>No link or payee is guaranteed safe</span></footer>
-</div>
+<footer class="foot"><span>QRShield &mdash; educational cybersecurity prototype</span><span>Open source: jsQR &middot; jsPDF &middot; Vite</span><span>No link or payee is guaranteed safe</span></footer>
 </div>`;
 
 const $=s=>document.querySelector(s);
 let last=null,stream=null,frame=null,liveSeq=0;
-
-/* v4 crafted interactions (hand-written, inspired by credited open-source UI work - see README "UI design credits"):
-   - decrypt/scramble reveal on the verdict and hero word  (idea: React Bits "Decrypted Text")
-   - pointer spotlight on panels                            (idea: React Bits "Spotlight Card")
-   - staggered finding rows + press states                  (idea: microkit microinteractions) */
-const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const GLYPHS='ABCDEF0123456789#$%&*+';
-function scramble(el,final){
-  if(REDUCED||!el){if(el)el.textContent=final;return}
-  let step=0;const total=Math.max(10,final.length*2);
-  const id=setInterval(()=>{
-    step++;
-    el.textContent=final.split('').map((ch,i)=>ch===' '?' ':(i<(step/total)*final.length?ch:GLYPHS[Math.random()*GLYPHS.length|0])).join('');
-    if(step>=total){el.textContent=final;clearInterval(id)}
-  },28);
-}
-document.querySelectorAll('.panel').forEach(p=>{
-  p.addEventListener('pointermove',e=>{
-    const r=p.getBoundingClientRect();
-    p.style.setProperty('--mx',(e.clientX-r.left)+'px');
-    p.style.setProperty('--my',(e.clientY-r.top)+'px');
-  });
-});
-scramble(document.querySelector('.hero h1 em'),'interact');
 function showMessage(msg){$('#message').textContent=msg}
 function safe(t){return String(t).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
-const TAG={high:'HIGH',caution:'WARN',info:'INFO',unknown:'NOTE'};
+const TAG={high:'FLAG',caution:'WARN',info:'NOTE',unknown:'NOTE'};
 
 function renderHistory(){
   const list=$('#histlist');const entries=history.list();
@@ -121,14 +78,14 @@ function renderHistory(){
 }
 
 function liveBadgeHtml(live,state){
-  if(state==='checking')return `<div class="live checking"><span class="spinner"></span><span>CHECKING LIVE THREAT LIST<small>Only this URL is sent to the check service, never other QR content.</small></span></div>`;
-  if(!live||live.status==='unknown')return `<div class="live unknown"><span class="dot"></span><span>LIVE THREAT LIST &middot; <b>NOT CHECKED</b><small>lookup unavailable or not configured - unknown, not safe</small></span></div>`;
-  if(live.status==='flagged')return `<div class="live flagged"><span class="dot"></span><span>LIVE THREAT LIST &middot; <b>LISTED AS DANGEROUS</b><small>${safe((live.threats||[]).join(', '))} - ${safe(live.source||'threat list')}</small></span></div>`;
-  return `<div class="live nomatch"><span class="dot"></span><span>LIVE THREAT LIST &middot; <b>NOT ON THE LIST</b><small>${safe(live.source||'threat list')} - still not proof of safety</small></span></div>`;
+  if(state==='checking')return `<div class="live checking"><span class="spinner"></span><span>Live threat list &mdash; checking&hellip;<small>Only this URL is sent to the check service, never other QR content.</small></span></div>`;
+  if(!live||live.status==='unknown')return `<div class="live unknown"><span class="dot"></span><span>Live threat list &mdash; <b>not checked</b><small>lookup unavailable or not configured - unknown, not safe</small></span></div>`;
+  if(live.status==='flagged')return `<div class="live flagged"><span class="dot"></span><span>Live threat list &mdash; <b>listed as dangerous</b><small>${safe((live.threats||[]).join(', '))} - ${safe(live.source||'threat list')}</small></span></div>`;
+  return `<div class="live nomatch"><span class="dot"></span><span>Live threat list &mdash; <b>not on the list</b><small>${safe(live.source||'threat list')} - still not proof of safety</small></span></div>`;
 }
 
 function gaugeSvg(score,level){
-  if(score===null)return `<div class="gauge none"><span>?</span><small>N/A</small></div>`;
+  if(score===null)return `<div class="gauge none"><span>N/A</span></div>`;
   const r=44,c=2*Math.PI*r,off=c*(1-Math.min(100,score)/100);
   return `<svg class="gauge ${level}" viewBox="0 0 110 110"><circle class="track" cx="55" cy="55" r="${r}"/><circle class="fill" cx="55" cy="55" r="${r}" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 55 55)"/><text x="55" y="52" class="g-num" text-anchor="middle">${score}</text><text x="55" y="70" class="g-den" text-anchor="middle">/ 100</text></svg>`;
 }
@@ -139,10 +96,7 @@ function renderAssessment(liveState,live){
   $('#chip').className='chip '+(live&&live.status==='flagged'?'high':r.level);
   $('#chip').textContent=chipText;
   $('#assessment').className='details';
-  $('#assessment').innerHTML=`<div class="verdict ${r.level}"><div class="verdict-main"><span class="verdict-kicker">VERDICT</span><span class="verdict-word"></span><span class="verdict-sub">${safe(r.headline)}</span></div>${gaugeSvg(r.score,r.level)}</div><p class="details-text">${safe(r.details)}</p>${isUrl?liveBadgeHtml(live,liveState):''}<div class="findings">${r.findings.map((x,i)=>`<div class="finding" style="--i:${i}"><span class="tag ${safe(x.level)}">${TAG[x.level]||'NOTE'}</span><span class="finding-text">${safe(x.label)}</span></div>`).join('')}</div><div class="caveat">Educational assessment only. Absence of warnings does not prove safety.</div>`;
-  scramble($('#assessment .verdict-word'),chipText);
-  const g=$('#assessment .gauge .fill');
-  if(g&&!REDUCED){const target=g.getAttribute('stroke-dashoffset');g.style.strokeDashoffset=g.getAttribute('stroke-dasharray');requestAnimationFrame(()=>requestAnimationFrame(()=>{g.style.strokeDashoffset=target}))}
+  $('#assessment').innerHTML=`<div class="verdict ${r.level}"><div class="verdict-main"><span class="verdict-kicker">Verdict</span><span class="verdict-word">${chipText}</span><span class="verdict-sub">${safe(r.headline)}</span></div>${gaugeSvg(r.score,r.level)}</div><p class="details-text">${safe(r.details)}</p>${isUrl?liveBadgeHtml(live,liveState):''}<div class="findings">${r.findings.map(x=>`<div class="finding"><span class="tag ${safe(x.level)}">${TAG[x.level]||'NOTE'}</span><span class="finding-text">${safe(x.label)}</span></div>`).join('')}</div><div class="caveat">Educational assessment only. Absence of warnings does not prove safety.</div>`;
 }
 
 function run(text){
