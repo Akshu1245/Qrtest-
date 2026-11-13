@@ -56,18 +56,19 @@ export function buildExplainMessages({ type, level, score, headline, findings })
   ];
 }
 
-export async function explainWithLlm(payload, { key, model, baseUrl, fetchImpl } = {}) {
-  const fetchFn = fetchImpl || globalThis.fetch;
-  if (!key || typeof fetchFn !== 'function') return { status: 'unavailable', reason: 'not-configured' };
+const DEFAULT_MODELS = ['glm-4-7-flash:free', 'lfm-3-1-7b:free', 'llama-3-3-70b-instruct:free'];
+const PER_TRY_MS = 18000; // per model; total stays under maxDuration
+
+async function tryModel(payload, model, { key, baseUrl, fetchFn }) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 40000);
+  const timer = setTimeout(() => ctrl.abort(), PER_TRY_MS);
   try {
     const res = await fetchFn((baseUrl || 'https://kenari.id/v1') + '/chat/completions', {
       method: 'POST',
       signal: ctrl.signal,
       headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key },
       body: JSON.stringify({
-        model: model || 'glm-4-7-flash:free',
+        model,
         messages: buildExplainMessages(payload),
         temperature: 0.2,
         max_tokens: 1500 // reasoning models spend tokens on hidden reasoning before content
@@ -77,12 +78,27 @@ export async function explainWithLlm(payload, { key, model, baseUrl, fetchImpl }
     const data = await res.json();
     const text = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
     if (typeof text !== 'string' || !text.trim()) return { status: 'unavailable', reason: 'empty' };
-    return { status: 'ok', explanation: text.trim().slice(0, 1200) };
+    return { status: 'ok', explanation: text.trim().slice(0, 1200), model };
   } catch (e) {
     return { status: 'unavailable', reason: e && e.name === 'AbortError' ? 'timeout' : 'failure' };
   } finally {
     clearTimeout(timer);
   }
+}
+
+// Free-tier models hang or rate-limit unpredictably: try each in order and
+// return the first real answer, never a fabricated one.
+export async function explainWithLlm(payload, { key, model, models, baseUrl, fetchImpl } = {}) {
+  const fetchFn = fetchImpl || globalThis.fetch;
+  if (!key || typeof fetchFn !== 'function') return { status: 'unavailable', reason: 'not-configured' };
+  const list = models || (model ? [model] : DEFAULT_MODELS);
+  let lastErr = 'failure';
+  for (const m of list) {
+    const out = await tryModel(payload, m, { key, baseUrl, fetchFn });
+    if (out.status === 'ok') return out;
+    lastErr = m + ':' + out.reason;
+  }
+  return { status: 'unavailable', reason: lastErr };
 }
 
 export default async function handler(req, res) {

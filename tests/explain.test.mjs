@@ -31,8 +31,15 @@ test('explainWithLlm rewords only the deterministic findings',async()=>{
 });
 
 test('explainWithLlm reports upstream failure without faking content',async()=>{
-  const out=await explainWithLlm(goodBody,{key:'k',fetchImpl:async()=>({ok:false,status:429})});
-  assert.equal(out.status,'unavailable'); assert.equal(out.reason,'upstream-429');
+  const out=await explainWithLlm(goodBody,{key:'k',models:['m1'],fetchImpl:async()=>({ok:false,status:429})});
+  assert.equal(out.status,'unavailable'); assert.equal(out.reason,'m1:upstream-429');
+});
+
+test('explainWithLlm falls back to the next model when one hangs or fails',async()=>{
+  let n=0;
+  const fetchImpl=async()=>{ n++; if(n===1)return {ok:false,status:429}; return { ok:true, json:async()=>({choices:[{message:{content:'Plain wording here.'}}]}) } };
+  const out=await explainWithLlm(goodBody,{key:'k',models:['m1','m2'],fetchImpl});
+  assert.equal(out.status,'ok'); assert.equal(out.model,'m2'); assert.equal(n,2);
 });
 
 test('handler: GET is rejected, missing key is 501',async()=>{
