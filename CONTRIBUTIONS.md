@@ -18,4 +18,4 @@ Licenses are retained via the packages' own distributions (`node_modules`) and t
 
 All other files in this repository — the rules engine (`src/analyzer.mjs`), UPI parser, threat-intel client (`src/threatintel.mjs`), serverless endpoint (`api/check-url.js`), scan history (`src/history.mjs`), report builders (`src/report.mjs`), user interface (`src/main.js`, `src/style.css`) and the test suite — are project code written for this internship project.
 
-> **To confirm before submission:** the individual author(s) of the project code should be named here exactly as the internship records require, and any parts originally drafted with tool assistance should be described honestly if the college or company asks.
+**Author statement:** K S Akshay states (WhatsApp, 13 Nov 2026) that he did the whole project himself. This file records that statement; the commit history and the author's ability to explain and demonstrate every module (see VIVA_GUIDE.md) are the evidence to bring to submission. Third-party libraries and the optional Google Web Risk service remain credited above and are not part of the original work.
