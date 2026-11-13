@@ -18,6 +18,8 @@
 const MAX_FINDINGS = 25;
 const MAX_LABEL = 240;
 
+export const maxDuration = 45; // free-tier models can be slow; keep above the LLM timeout
+
 export function validateExplainBody(body) {
   if (!body || typeof body !== 'object') return 'bad-body';
   const { type, level, headline, findings } = body;
@@ -58,7 +60,7 @@ export async function explainWithLlm(payload, { key, model, baseUrl, fetchImpl }
   const fetchFn = fetchImpl || globalThis.fetch;
   if (!key || typeof fetchFn !== 'function') return { status: 'unavailable', reason: 'not-configured' };
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 12000);
+  const timer = setTimeout(() => ctrl.abort(), 40000);
   try {
     const res = await fetchFn((baseUrl || 'https://kenari.id/v1') + '/chat/completions', {
       method: 'POST',
@@ -68,7 +70,7 @@ export async function explainWithLlm(payload, { key, model, baseUrl, fetchImpl }
         model: model || 'glm-4-7-flash:free',
         messages: buildExplainMessages(payload),
         temperature: 0.2,
-        max_tokens: 220
+        max_tokens: 1500 // reasoning models spend tokens on hidden reasoning before content
       })
     });
     if (!res.ok) return { status: 'unavailable', reason: 'upstream-' + res.status };
