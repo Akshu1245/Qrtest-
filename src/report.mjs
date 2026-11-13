@@ -71,27 +71,54 @@ export function toText(model){
   return lines.join('\n');
 }
 
-/** Render the model to a jsPDF document. jsPDF is imported by the caller bundle. */
-export function toPdf(model,JsPDF){
+/**
+ * Render the model to a jsPDF document. jsPDF is imported by the caller bundle.
+ * extras (all optional): qrDataUrl (QR of the scanned content), sourceImage
+ * (data URL of the uploaded QR image or camera frame), siteUrl (live app URL
+ * for the footer). Images that fail to embed are skipped, never fatal.
+ */
+export async function toPdf(model,JsPDF,extras={}){
   const doc=new JsPDF({unit:'pt',format:'a4'});
-  const pageW=doc.internal.pageSize.getWidth();
+  const pageW=doc.internal.pageSize.getWidth(),pageH=doc.internal.pageSize.getHeight();
   const margin=48;let y=64;
   const line=(text,size=10,style='normal',color=[31,41,55])=>{
     doc.setFont('helvetica',style);doc.setFontSize(size);doc.setTextColor(...color);
     const wrapped=doc.splitTextToSize(text,pageW-margin*2);
-    for(const w of wrapped){if(y>780){doc.addPage();y=64}doc.text(w,margin,y);y+=size+5}
+    for(const w of wrapped){if(y>760){doc.addPage();y=64}doc.text(w,margin,y);y+=size+5}
   };
   const gap=(n=8)=>{y+=n};
+  const image=(dataUrl,x,top,w,h,format)=>{try{doc.addImage(dataUrl,format,x,top,w,h);return true}catch{return false}};
+
   line('QRSHIELD',22,'bold',[8,47,73]);
-  line('Security Assessment Report',13,'normal',[20,83,107]);gap(14);
+  line('Security Assessment Report - QR & Link Risk Checker',13,'normal',[20,83,107]);gap(14);
   doc.setDrawColor(20,83,107);doc.line(margin,y,pageW-margin,y);gap(14);
   line('Generated: '+model.generatedAt,10);
   line('Category: '+model.category+'    Risk level: '+model.riskLevel+'    Heuristic score: '+model.heuristicScore,10,'bold');
   gap(6);line('Live threat-list check: '+model.liveCheck,10);gap(10);
+
+  if(extras.qrDataUrl){
+    if(y>560){doc.addPage();y=64}
+    line('Scanned content as a QR code',11,'bold',[20,83,107]);
+    gap(4);
+    if(image(extras.qrDataUrl,margin,y,120,120,'PNG')){
+      doc.setFont('helvetica','italic');doc.setFontSize(8);doc.setTextColor(100,116,139);
+      doc.text('Regenerated from the scanned content. Compare with the original code before trusting it.',margin+132,y+12);
+      y+=132;gap(8);
+    }else{gap(-4)}
+  }
+
   line('Scanned content',11,'bold',[20,83,107]);
   line(model.scannedContent||'(empty)',9);
   if(model.contentNote)line(model.contentNote,9,'italic',[146,64,14]);
   gap(10);
+
+  if(extras.sourceImage){
+    if(y>480){doc.addPage();y=64}
+    line('Captured image',11,'bold',[20,83,107]);
+    gap(4);
+    if(image(extras.sourceImage,margin,y,220,150,'JPEG')){y+=162;gap(8)}else{gap(-4)}
+  }
+
   line('Summary',11,'bold',[20,83,107]);
   line(model.headline,10,'bold');line(model.summary,10);gap(10);
   line('Detection findings',11,'bold',[20,83,107]);
@@ -107,5 +134,14 @@ export function toPdf(model,JsPDF){
   doc.setDrawColor(203,213,225);doc.line(margin,y,pageW-margin,y);gap(10);
   line('Limitations and disclaimer',10,'bold',[100,116,139]);
   line(model.limitations,8,'italic',[100,116,139]);
+
+  const pages=doc.getNumberOfPages();
+  for(let p=1;p<=pages;p++){
+    doc.setPage(p);
+    doc.setDrawColor(203,213,225);doc.line(margin,pageH-40,pageW-margin,pageH-40);
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(100,116,139);
+    doc.text('QRShield - educational cybersecurity prototype'+(extras.siteUrl?' - '+extras.siteUrl:''),margin,pageH-26);
+    doc.text('Page '+p+' of '+pages,pageW-margin,pageH-26,{align:'right'});
+  }
   return doc;
 }

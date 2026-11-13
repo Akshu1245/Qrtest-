@@ -37,14 +37,14 @@ app.innerHTML=`<div class="page">
       <input id="file" type="file" accept="image/png,image/jpeg,image/webp" hidden>
       <button id="stop" class="btn-ghost" hidden>Stop camera</button>
       <video id="video" playsinline muted hidden></video>
-      <div class="drop" id="drop"><span>Drop a QR image here &middot; PNG, JPG, WebP &middot; max 8 MB</span></div>
+      <label class="drop" id="drop" for="file" title="Click to choose a QR image, or drop one here"><span>Drop a QR image here, or click to choose one &middot; PNG, JPG, WebP &middot; max 8 MB</span></label>
       <div id="message" role="status" aria-live="polite"></div>
       <div class="t-meta"><span>Nothing is uploaded</span><span>Decoding happens on this device with jsQR</span></div>
     </section>
   </section>
   <section id="result" class="result">
     <div id="assessment" class="empty"><span class="empty-label">Verdict</span><p class="empty-main">No scan yet.</p><p class="empty-sub">Your findings, risk indicators and recommendations will appear here.</p></div>
-    <div class="actions exportrow"><button id="export-txt" class="btn-ghost export" disabled>${ICONS.download}<span>Text report</span></button><button id="export-pdf" class="btn-ghost export" disabled>${ICONS.download}<span>PDF report</span></button></div>
+    <div class="actions exportrow"><button id="export-txt" class="btn-ghost export" disabled title="Run a scan first">${ICONS.download}<span>Text report</span></button><button id="export-pdf" class="btn-ghost export" disabled title="Run a scan first">${ICONS.download}<span>PDF report</span></button></div>
   </section>
   <div class="row2">
     <section id="history" class="hist">
@@ -67,7 +67,7 @@ app.innerHTML=`<div class="page">
 </div>`;
 
 const $=s=>document.querySelector(s);
-let last=null,stream=null,frame=null,liveSeq=0;
+let last=null,stream=null,frame=null,liveSeq=0,explainSeq=0,lastSourceImage=null;
 function showMessage(msg){$('#message').textContent=msg}
 function safe(t){return String(t).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
 const TAG={high:'FLAG',caution:'WARN',info:'NOTE',unknown:'NOTE'};
@@ -99,7 +99,28 @@ function renderAssessment(liveState,live){
   $('#chip').className='chip '+(live&&live.status==='flagged'?'high':r.level);
   $('#chip').textContent=chipText;
   $('#assessment').className='details';
-  $('#assessment').innerHTML=`<div class="verdict ${r.level}"><div class="verdict-main"><span class="verdict-kicker">Verdict</span><span class="verdict-word">${chipText}</span><span class="verdict-sub">${safe(r.headline)}</span></div>${gaugeSvg(r.score,r.level)}</div><p class="details-text">${safe(r.details)}</p>${isUrl?liveBadgeHtml(live,liveState):''}<div class="findings">${r.findings.map(x=>`<div class="finding"><span class="tag ${safe(x.level)}">${TAG[x.level]||'NOTE'}</span><span class="finding-text">${safe(x.label)}</span></div>`).join('')}</div><div class="caveat">Educational assessment only. Absence of warnings does not prove safety.</div>`;
+  $('#assessment').innerHTML=`<div class="verdict ${r.level}"><div class="verdict-main"><span class="verdict-kicker">Verdict</span><span class="verdict-word">${chipText}</span><span class="verdict-sub">${safe(r.headline)}</span></div>${gaugeSvg(r.score,r.level)}</div><p class="details-text">${safe(r.details)}</p>${isUrl?liveBadgeHtml(live,liveState):''}<div class="findings">${r.findings.map(x=>`<div class="finding"><span class="tag ${safe(x.level)}">${TAG[x.level]||'NOTE'}</span><span class="finding-text">${safe(x.label)}</span></div>`).join('')}</div><div id="explain"></div><div class="caveat">Educational assessment only. Absence of warnings does not prove safety.</div>`;
+}
+
+// Rephrases the deterministic findings in simple words via /api/explain.
+// The LLM only rewords; the rule engine above is the only assessment.
+// Any failure leaves the block hidden - no fake or stale wording.
+async function explainLive(r){
+  const seq=++explainSeq;
+  if(!r.findings.length)return;
+  try{
+    const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),18000);
+    const res=await fetch('/api/explain',{method:'POST',signal:ctrl.signal,headers:{'content-type':'application/json'},
+      body:JSON.stringify({type:r.type,level:r.level,score:r.score,headline:r.headline,findings:r.findings.map(f=>({label:f.label,level:f.level}))})});
+    clearTimeout(timer);
+    if(seq!==explainSeq)return; // a newer scan replaced this one
+    if(!res.ok)return;
+    const data=await res.json();
+    if(data&&data.status==='ok'&&typeof data.explanation==='string'){
+      const box=$('#explain');if(!box)return;
+      box.innerHTML=`<div class="explain-block"><div class="explain-h">In simple words</div><p>${safe(data.explanation)}</p><div class="explain-fine">AI rewording of the findings above. It may be imperfect - the verdict, score and findings from QRShield's rules are the assessment.</div></div>`;
+    }
+  }catch{/* offline or unavailable: leave the block hidden */}
 }
 
 function run(text){
@@ -111,9 +132,11 @@ function run(text){
     last={input:text,analysis:analyze(text),live:null};
     renderAssessment('idle',null);
     $('#export-txt').disabled=false;$('#export-pdf').disabled=false;
+    $('#export-txt').title='Download the report as text';$('#export-pdf').title='Download the report as PDF';
     history.add({input:text,type:last.analysis.type,level:last.analysis.level,score:last.analysis.score,headline:last.analysis.headline,checkedAt:last.analysis.checkedAt});
     renderHistory();
     showMessage('Analysis completed locally');
+    if(['url','upi','wifi'].includes(last.analysis.type))explainLive(last.analysis);
     if(last.analysis.type==='url'){
       const seq=++liveSeq;renderAssessment('checking',null);
       checkUrlLive(text).then(live=>{
@@ -143,6 +166,7 @@ async function decodeImage(file){
       const data=ctx.getImageData(0,0,c.width,c.height);
       const qr=jsQR(data.data,data.width,data.height,{inversionAttempts:'attemptBoth'});
       if(!qr)throw Error('No readable QR code found. Try a sharper image.');
+      lastSourceImage=c.toDataURL('image/jpeg',0.72); // keep the source image for the PDF report
       run(qr.data);
     }finally{bmp.close()}
   }catch(e){showMessage(e.message)}
@@ -153,9 +177,22 @@ $('#drop').ondragleave=()=>$('#drop').classList.remove('drag');
 $('#drop').ondrop=e=>{e.preventDefault();$('#drop').classList.remove('drag');decodeImage(e.dataTransfer.files[0])};
 
 async function startCamera(){
-  if(!navigator.mediaDevices?.getUserMedia){showMessage('Camera requires HTTPS or localhost and browser permission.');return}
+  const btn=$('#camera');
+  if(!window.isSecureContext){showMessage('Camera needs a secure (HTTPS) page. Open the live https:// site, or use Scan image instead.');return}
+  if(!navigator.mediaDevices?.getUserMedia){showMessage('This browser does not support camera access. Use Scan image instead.');return}
+  if(btn.disabled)return;
+  btn.disabled=true;
   try{
-    showMessage('Starting camera…');
+    // If the browser already blocked the camera for this site, getUserMedia
+    // fails silently without a prompt - explain that instead of looking dead.
+    try{
+      const perm=navigator.permissions&&await navigator.permissions.query({name:'camera'});
+      if(perm&&perm.state==='denied'){
+        showMessage('Camera is blocked for this site. Click the lock / settings icon in the address bar, allow camera, then try again - or use Scan image.');
+        return;
+      }
+    }catch{/* permissions API optional */}
+    showMessage('Starting camera - your browser may ask for permission…');
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
     const video=$('#video');video.srcObject=stream;video.hidden=false;$('#stop').hidden=false;
     await video.play();showMessage('Point the camera toward a QR code.');
@@ -168,13 +205,30 @@ async function startCamera(){
         if(c.width&&c.height){
           ctx.drawImage(video,0,0);
           const d=ctx.getImageData(0,0,c.width,c.height),qr=jsQR(d.data,d.width,d.height,{inversionAttempts:'dontInvert'});
-          if(qr){run(qr.data);return}
+          if(qr){
+            const cap=document.createElement('canvas');
+            const s=Math.min(1,900/Math.max(c.width,c.height));
+            cap.width=Math.round(c.width*s);cap.height=Math.round(c.height*s);
+            cap.getContext('2d').drawImage(c,0,0,cap.width,cap.height);
+            lastSourceImage=cap.toDataURL('image/jpeg',0.72); // camera frame for the PDF report
+            run(qr.data);return
+          }
         }
       }
       frame=requestAnimationFrame(tick);
     }
     frame=requestAnimationFrame(tick);
-  }catch(e){showMessage('Cannot start camera: '+e.message);stopCamera()}
+  }catch(e){
+    const byName={
+      NotAllowedError:'Camera permission was denied. Click the lock / settings icon in the address bar, allow camera, then try again - or use Scan image.',
+      NotFoundError:'No camera was found on this device. Use Scan image instead.',
+      NotReadableError:'The camera is busy in another app or tab. Close it there and try again.',
+      OverconstrainedError:'No suitable camera was found. Use Scan image instead.',
+      SecurityError:'Camera needs a secure (HTTPS) page. Use Scan image instead.'
+    };
+    showMessage(byName[e&&e.name]||('Cannot start camera: '+(e&&e.message||e)));
+    stopCamera();
+  }finally{btn.disabled=false}
 }
 function stopCamera(){if(frame)cancelAnimationFrame(frame);frame=null;if(stream){stream.getTracks().forEach(x=>x.stop());stream=null}$('#video').hidden=true;$('#stop').hidden=true}
 $('#camera').onclick=startCamera;$('#stop').onclick=stopCamera;window.addEventListener('pagehide',stopCamera);
@@ -185,8 +239,13 @@ $('#export-pdf').onclick=async()=>{
   if(!last)return;
   const btn=$('#export-pdf');btn.disabled=true;btn.querySelector('span:last-child').textContent='Building…';
   try{
-    const { jsPDF }=await import('jspdf');
-    const doc=toPdf(buildReportModel(last.input,last.analysis,last.live),jsPDF);
+    const [ { jsPDF }, QRCode ]=await Promise.all([import('jspdf'),import('qrcode')]);
+    let qrDataUrl=null;
+    try{ qrDataUrl=await QRCode.toDataURL(last.input.slice(0,500),{margin:1,width:240,errorCorrectionLevel:'M'}) }
+    catch{/* content too long to re-encode as QR: export without it */}
+    const doc=await toPdf(buildReportModel(last.input,last.analysis,last.live),jsPDF,{
+      qrDataUrl, sourceImage:lastSourceImage, siteUrl:location.host
+    });
     doc.save('qrshield-report.pdf');
   }catch(e){showMessage('PDF export failed: '+e.message)}
   finally{btn.disabled=false;btn.querySelector('span:last-child').textContent='PDF report'}

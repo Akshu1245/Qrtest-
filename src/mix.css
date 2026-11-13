@@ -32,3 +32,21 @@ h1 em{background:none;color:var(--red);display:inline-block;position:relative}
 /* --- pin: The Juice / Marlinde - hand-written wordmark --- */
 .logo span{font-family:"Caveat",cursive;font-weight:700;font-size:28px;letter-spacing:0}
 .logo sup{font-family:var(--disp)}
+
+/* Clickability affordances (fix round: buttons must read as clickable) */
+button,.btn-ghost{cursor:pointer}
+.btn-ghost:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
+.btn-ink:hover:not(:disabled){transform:translate(-1px,-1px)}
+.btn-ghost:active:not(:disabled),.btn-ink:active:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn-ghost:disabled{cursor:not-allowed}
+:focus-visible{outline:2px dashed var(--red);outline-offset:3px}
+.histitem{cursor:pointer}
+.drop{cursor:pointer}
+.drop:hover{border-color:var(--red);background:rgba(195,58,31,.05)}
+.nav a{cursor:pointer}
+
+/* Simple-words block (server-side LLM rewording of findings) */
+.explain-block{margin-top:14px;border:1.5px solid var(--ink);background:var(--paper2);padding:12px 14px;box-shadow:4px 4px 0 var(--ink)}
+.explain-h{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+.explain-block p{font-size:13.5px;line-height:1.55;margin:0}
+.explain-fine{margin-top:8px;font-size:10.5px;font-style:italic;color:var(--ink2)}

@@ -8,4 +8,12 @@ test('report text never promises safety',()=>{const m=buildReportModel('https://
 test('flagged live result appears in report',()=>{const m=buildReportModel('https://x.example',sample,{status:'flagged',threats:['MALWARE'],source:'Google Web Risk'});assert.match(m.liveCheck,/dangerous/i);assert.match(m.recommendations.join(' '),/Do not open/i)});
 test('unavailable live check is reported as not checked',()=>{const m=buildReportModel('https://x.example',sample,null);assert.match(m.liveCheck,/Not checked/i)});
 test('UPI report recommends independent verification',()=>{const a=analyze('upi://pay?pa=shop@okbank&pn=Shop&am=500');const m=buildReportModel('upi://pay?pa=shop@okbank&pn=Shop&am=500',a);assert.match(m.recommendations.join(' '),/trusted payment app/i)});
-test('PDF renders locally with jsPDF',async()=>{const {jsPDF}=await import('jspdf');const m=buildReportModel('https://example.com',analyze('https://example.com'));const doc=toPdf(m,jsPDF);const out=doc.output('datauristring');assert.match(out,/^data:application\/pdf/);assert.ok(out.length>2000)});
+test('PDF renders locally with jsPDF',async()=>{const {jsPDF}=await import('jspdf');const m=buildReportModel('https://example.com',analyze('https://example.com'));const doc=await toPdf(m,jsPDF);const out=doc.output('datauristring');assert.match(out,/^data:application\/pdf/);assert.ok(out.length>2000)});
+test('PDF renders with QR, source image and footer extras',async()=>{
+  const {jsPDF}=await import('jspdf');const QRCode=await import('qrcode');
+  const m=buildReportModel('https://example.com',analyze('https://example.com'));
+  const qrDataUrl=await QRCode.toDataURL('https://example.com',{margin:1,width:240});
+  const doc=await toPdf(m,jsPDF,{qrDataUrl,sourceImage:qrDataUrl,siteUrl:'qrshield-lac.vercel.app'});
+  const out=doc.output('datauristring');
+  assert.match(out,/^data:application\/pdf/);assert.ok(doc.getNumberOfPages()>=1);
+});
