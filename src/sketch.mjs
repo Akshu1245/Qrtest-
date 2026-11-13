@@ -44,17 +44,42 @@ function drawFrame(el){
   }));
 }
 
+// v10: hand-drawn red-pen circle around the hero key word (board marker graphics)
+function drawEmMark(){
+  const em=document.querySelector('h1 em');if(!em)return;
+  const w=em.offsetWidth,h=em.offsetHeight;
+  let svg=em.querySelector(':scope > svg.em-mark');
+  if(!w||!h){if(svg)svg.remove();return}
+  if(!svg){
+    svg=document.createElementNS(SVGNS,'svg');
+    svg.classList.add('em-mark');
+    svg.setAttribute('aria-hidden','true');
+    em.prepend(svg);
+    if(ro)ro.observe(em);
+  }
+  svg.setAttribute('width',w+20);
+  svg.setAttribute('height',h+16);
+  svg.style.left='-10px';
+  svg.style.top='-8px';
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  const rc=rough.svg(svg);
+  svg.appendChild(rc.ellipse((w+20)/2,(h+16)/2,w+14,h+10,{
+    stroke:'#c33a1f',strokeWidth:1.6,roughness:2,bowing:2,seed:42,fill:'none'
+  }));
+}
+
 function scan(){
   scheduled=false;
   document.querySelectorAll(SELECTORS.join(',')).forEach(el=>{
     if(!framed.has(el)){framed.add(el);if(ro)ro.observe(el)}
   });
   framed.forEach(drawFrame);
+  drawEmMark();
 }
 function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(scan)}}
 
 export function initSketch(){
-  ro=new ResizeObserver(entries=>{for(const e of entries)drawFrame(e.target)});
+  ro=new ResizeObserver(entries=>{for(const e of entries){if(e.target.matches('h1 em'))drawEmMark();else drawFrame(e.target)}});
   new MutationObserver(schedule).observe(document.querySelector('#app'),{childList:true,subtree:true});
   window.addEventListener('resize',schedule);
   requestAnimationFrame(scan);          // after main.js body has rendered

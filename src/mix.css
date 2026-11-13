@@ -1,0 +1,34 @@
+/* v10-mix: more concrete elements from Akshay's pins, named per element.
+   Pin sources: Lionsgate + Spartan + Myfinn (dark band rhythm), Fintech
+   (layered overlap), The Juice + Marlinde studio (script wordmark/accents),
+   Synthia kitchens (mono trust/credits row), board marker graphics
+   (hand-drawn red circle on the key word). Base stays v9 hand-drawn dossier. */
+
+/* --- pin: board marker graphics - red-pen circle around the key word --- */
+h1 em{background:none;color:var(--red);display:inline-block;position:relative}
+.em-mark{position:absolute;pointer-events:none;overflow:visible;z-index:0}
+
+/* --- pin: Lionsgate/Spartan dark band - the annex panel --- */
+.row2{background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);
+  box-shadow:10px 10px 0 rgba(25,23,18,.18);padding:34px 34px 30px;gap:48px}
+.row2 .sec-h{color:var(--paper)}
+.row2 .sec-h::before{color:var(--red)}
+.row2 .toggle,.row2 .fine,.row2 .histempty,.row2 .steps p,.row2 .histtime,
+.row2 .histmain small{color:rgba(242,239,231,.62)}
+.row2 .histlist,.row2 .steps li:first-child{border-top-color:rgba(242,239,231,.5)}
+.row2 .histitem,.row2 .steps li{border-bottom-color:rgba(242,239,231,.22)}
+.row2 .histitem{color:var(--paper)}
+.row2 .histitem:hover{background:rgba(242,239,231,.07)}
+.row2 .steps b{color:var(--paper)}
+.row2 .btn-ghost{color:var(--paper);background:transparent;box-shadow:4px 4px 0 rgba(242,239,231,.85)}
+.row2 .btn-ghost:hover:not(:disabled){background:rgba(242,239,231,.1)}
+.row2 .btn-ghost{--sketch-color:#f2efe7}
+.row2 .toggle input{accent-color:var(--red)}
+
+/* --- pin: Synthia trust row - footer as mono credits strip --- */
+.foot{border-top:1.5px solid var(--ink);font-family:var(--mono);
+  letter-spacing:.08em;text-transform:uppercase;font-size:10.5px}
+
+/* --- pin: The Juice / Marlinde - hand-written wordmark --- */
+.logo span{font-family:"Caveat",cursive;font-weight:700;font-size:28px;letter-spacing:0}
+.logo sup{font-family:var(--disp)}
