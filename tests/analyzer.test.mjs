@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {analyze} from '../src/analyzer.mjs';
+test('No link is labelled guaranteed safe',()=>{const r=analyze('https://example.com');assert.equal(r.level,'unknown');assert.match(r.details,/does NOT mean.*safe/i)});
+test('HTTP link gets caution',()=>assert.equal(analyze('http://example.com').level,'caution'));
+test('Obvious suspicious URL is high',()=>assert.equal(analyze('http://paypal-verify-account.xyz/urgent-action').level,'high'));
+test('Embedded credential URL high',()=>assert.equal(analyze('https://user:pass@example.com').level,'high'));
+test('Dangerous scheme blocked',()=>assert.equal(analyze('javascript:alert(1)').level,'high'));
+test('Valid UPI parsed without pretending verified',()=>{const r=analyze('upi://pay?pa=shop@okbank&pn=Shop&am=500&cu=INR');assert.equal(r.type,'upi');assert.match(r.details,/cannot confirm/i);assert.ok(r.findings.some(x=>x.label.includes('500.00')))});
+test('Missing UPI payee high',()=>assert.equal(analyze('upi://pay?pn=Fake').level,'high'));
+test('Unexpected UPI currency warning',()=>assert.equal(analyze('upi://pay?pa=shop@okbank&cu=USD').level,'caution'));
+test('Invalid URL handled without throwing',()=>assert.equal(analyze('https://%').level,'caution'));
+test('Non URL text unknown',()=>assert.equal(analyze('hello world').level,'unknown'));
+test('WiFi QR recognized',()=>assert.equal(analyze('WIFI:T:WPA;S:demo;P:1234;;').type,'wifi'));
