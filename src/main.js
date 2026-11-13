@@ -109,7 +109,7 @@ async function explainLive(r){
   const seq=++explainSeq;
   if(!r.findings.length)return;
   try{
-    const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),18000);
+    const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),45000);
     const res=await fetch('/api/explain',{method:'POST',signal:ctrl.signal,headers:{'content-type':'application/json'},
       body:JSON.stringify({type:r.type,level:r.level,score:r.score,headline:r.headline,findings:r.findings.map(f=>({label:f.label,level:f.level}))})});
     clearTimeout(timer);
