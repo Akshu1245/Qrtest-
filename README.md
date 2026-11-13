@@ -69,6 +69,8 @@ This is an educational prototype, **not a commercial threat detection product**.
 - [jsQR](https://github.com/cozmo/jsQR) — Apache-2.0 — QR decoding
 - [jsPDF](https://github.com/parallax/jsPDF) — MIT — local PDF generation
 - [Vite](https://github.com/vitejs/vite) — MIT — build tooling
+- [Rough.js](https://github.com/rough-stuff/rough) — MIT — hand-sketched frames and pen marks in the interface
+- [Caveat](https://fonts.google.com/specimen/Caveat) — SIL Open Font License — handwriting typeface used for interface labels
 
 These are separately licensed open-source dependencies, not original work of this project. Everything else in this repository is original project code; see CONTRIBUTIONS.md.
 

@@ -7,6 +7,8 @@
 | [jsQR](https://github.com/cozmo/jsQR) | Apache-2.0 | Decoding QR codes from images and camera frames |
 | [jsPDF](https://github.com/parallax/jsPDF) | MIT | Generating PDF reports locally in the browser |
 | [Vite](https://github.com/vitejs/vite) | MIT | Development server and production builds |
+| [Rough.js](https://github.com/rough-stuff/rough) | MIT | Hand-sketched interface frames and pen marks |
+| [Caveat](https://fonts.google.com/specimen/Caveat) | SIL OFL | Handwriting typeface for interface labels |
 
 Licenses are retained via the packages' own distributions (`node_modules`) and their respective repositories.
 
