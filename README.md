@@ -9,7 +9,7 @@ A cybersecurity internship project. Scan a QR code with your camera or an image,
 - Optional live phishing check via Google Web Risk (server-side API key; honest "Not checked" when unavailable)
 - UPI QR inspection: payee VPA, displayed recipient name, amount, currency, payment note
 - Wi-Fi and contact card recognition
-- Explainable, cautious verdicts — no result is ever called "safe"
+- Explainable, cautious verdicts: no result is ever called "safe"
 - Local `.txt` and PDF report export (PDF generated on-device with jsPDF)
 - Optional scan history, private and local-only (browser localStorage), pausable and clearable
 - Responsive dark UI, no login, no database, no tracking
@@ -33,14 +33,14 @@ npm run preview   # serve the production build locally
 
 ## Live threat-intelligence setup (optional)
 
-The app works fully offline with local heuristics. For live checks it calls `GET /api/check-url?uri=<url>`, implemented as a serverless function in `api/check-url.js` (Vercel Node runtime). The function holds the API key — the browser never sees it.
+The app works fully offline with local heuristics. For live checks it calls `GET /api/check-url?uri=<url>`, implemented as a serverless function in `api/check-url.js` (Vercel Node runtime). The function holds the API key; the browser never sees it.
 
 1. Create a Google Cloud project and enable the **Web Risk API**.
 2. Create an API key and restrict it to the Web Risk API.
 3. Set it as an environment variable on the host: `WEBRISK_API_KEY=...` (never commit it; `.env` files are git-ignored).
 4. Deploy. Only `http(s)` URLs are sent for checking, and the UI tells the user this. UPI, Wi-Fi and text payloads never leave the device.
 
-Web Risk's Lookup API (`uris:search`) is free for up to 100,000 calls/month per account ([pricing](https://cloud.google.com/web-risk/pricing)); usage beyond that is billed by Google, so keep the key restricted and monitor quota. The older Safe Browsing API v4 is deprecated; Web Risk is its currently supported replacement. When the key is missing, quota is exhausted or the API fails, QRShield shows **"Not checked"** — never a safety verdict.
+Web Risk's Lookup API (`uris:search`) is free for up to 100,000 calls/month per account ([pricing](https://cloud.google.com/web-risk/pricing)); usage beyond that is billed by Google, so keep the key restricted and monitor quota. The older Safe Browsing API v4 is deprecated; Web Risk is its currently supported replacement. When the key is missing, quota is exhausted or the API fails, QRShield shows **"Not checked"**, never a safety verdict.
 
 ## What the code does
 

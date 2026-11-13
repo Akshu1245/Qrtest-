@@ -23,7 +23,7 @@ app.innerHTML=`<div class="page">
     <div class="hero-copy">
       <p class="kicker">A QR &amp; link risk checker that runs on your device</p>
       <h1>Inspect before<br>you <em>interact.</em></h1>
-      <p class="sub">QR codes hide where they lead. QRShield decodes them in your browser and explains the warning signs &mdash; links, UPI payments, Wi-Fi configs &mdash; before you pay, log in, or connect.</p>
+      <p class="sub">QR codes hide where they lead. QRShield decodes them in your browser and explains the warning signs (links, UPI payments, Wi-Fi configs) before you pay, log in, or connect.</p>
     </div>
     <section class="tool" id="check" aria-label="Check a link or QR payload">
       <div class="t-head"><span>Check a link or QR payload</span><span id="chip" class="chip idle">Not scanned</span></div>
@@ -57,12 +57,12 @@ app.innerHTML=`<div class="page">
       <ol class="steps">
         <li><b>Decode</b><p>QR pixels become text on your device with jsQR. Images and camera frames are never uploaded.</p></li>
         <li><b>Inspect</b><p>Transparent rules score URLs and UPI payment details. If configured, a server-side endpoint also checks the link against Google Web Risk.</p></li>
-        <li><b>Explain</b><p>Every point in the score is listed. When a check cannot run, the verdict is &ldquo;not checked&rdquo; &mdash; never &ldquo;safe&rdquo;.</p></li>
+        <li><b>Explain</b><p>Every point in the score is listed. When a check cannot run, the verdict is &ldquo;not checked&rdquo;, never &ldquo;safe&rdquo;.</p></li>
       </ol>
     </section>
   </div>
 </main>
-<footer class="foot"><span>QRShield &mdash; educational cybersecurity prototype</span><span>Open source: jsQR &middot; jsPDF &middot; Vite</span><span>No link or payee is guaranteed safe</span></footer>
+<footer class="foot"><span>QRShield &middot; educational cybersecurity prototype</span><span>Open source: jsQR &middot; jsPDF &middot; Vite</span><span>No link or payee is guaranteed safe</span></footer>
 </div>`;
 
 const $=s=>document.querySelector(s);
@@ -80,10 +80,10 @@ function renderHistory(){
 }
 
 function liveBadgeHtml(live,state){
-  if(state==='checking')return `<div class="live checking"><span class="spinner"></span><span>Live threat list &mdash; checking&hellip;<small>Only this URL is sent to the check service, never other QR content.</small></span></div>`;
-  if(!live||live.status==='unknown')return `<div class="live unknown"><span class="dot"></span><span>Live threat list &mdash; <b>not checked</b><small>lookup unavailable or not configured - unknown, not safe</small></span></div>`;
-  if(live.status==='flagged')return `<div class="live flagged"><span class="dot"></span><span>Live threat list &mdash; <b>listed as dangerous</b><small>${safe((live.threats||[]).join(', '))} - ${safe(live.source||'threat list')}</small></span></div>`;
-  return `<div class="live nomatch"><span class="dot"></span><span>Live threat list &mdash; <b>not on the list</b><small>${safe(live.source||'threat list')} - still not proof of safety</small></span></div>`;
+  if(state==='checking')return `<div class="live checking"><span class="spinner"></span><span>Live threat list: checking&hellip;<small>Only this URL is sent to the check service, never other QR content.</small></span></div>`;
+  if(!live||live.status==='unknown')return `<div class="live unknown"><span class="dot"></span><span>Live threat list: <b>not checked</b><small>lookup unavailable or not configured - unknown, not safe</small></span></div>`;
+  if(live.status==='flagged')return `<div class="live flagged"><span class="dot"></span><span>Live threat list: <b>listed as dangerous</b><small>${safe((live.threats||[]).join(', '))} - ${safe(live.source||'threat list')}</small></span></div>`;
+  return `<div class="live nomatch"><span class="dot"></span><span>Live threat list: <b>not on the list</b><small>${safe(live.source||'threat list')} - still not proof of safety</small></span></div>`;
 }
 
 function gaugeSvg(score,level){
