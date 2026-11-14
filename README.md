@@ -82,3 +82,10 @@ The v3/v4 interface is original code (vanilla CSS/JS, no copied components), wit
 - **microkit** ([github.com/henriquegpb/microkit](https://github.com/henriquegpb/microkit), MIT) — microinteraction ideas: press states, staggered row entrances.
 - **Magic UI** ([github.com/magicuidesign/magicui](https://github.com/magicuidesign/magicui), MIT) — shimmer/sheen button idea.
 - **React Bits** ([github.com/DavidHDev/react-bits](https://github.com/DavidHDev/react-bits), MIT + Commons Clause) — decrypted-text and spotlight-card ideas. Note: the Commons Clause forbids selling substantially derived software; this project is a non-commercial educational prototype. Re-implemented in vanilla JS from the published concept; no React code copied.
+
+## Screenshots
+
+Real captures of the live app (https://qrshield-lac.vercel.app):
+
+![QRShield desktop](docs/screenshot-desktop.png)
+![QRShield mobile](docs/screenshot-mobile.png)
