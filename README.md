@@ -26,7 +26,7 @@ npm run dev
 Open the localhost URL printed by Vite. For camera access on phones, serve over HTTPS and allow permission.
 
 ```bash
-npm test          # 46 unit tests
+npm test          # 56 unit tests
 npm run build     # production build to dist/
 npm run preview   # serve the production build locally
 ```
@@ -50,7 +50,7 @@ Web Risk's Lookup API (`uris:search`) is free for up to 100,000 calls/month per 
 - `src/report.mjs` — shared report model, `.txt` and PDF builders
 - `src/main.js` — scanner, UI wiring, exports
 - `api/check-url.js` — serverless Web Risk endpoint
-- `tests/` — 46 unit tests (rules, history, reports, threat-intel client)
+- `tests/` — 56 unit tests (rules, history, reports, threat-intel client)
 
 ## Security notes
 
